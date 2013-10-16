@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<!--
+
+	Race images from here :
+	http://s53.photobucket.com/user/unlatched/media/TI3_stuff/***.jpg.html
+	Where *** is a race's short name, e.g.:
+	http://s53.photobucket.com/user/unlatched/media/TI3_stuff/nekro.jpg.html
+
+-->
+
+<html>
+
+	<head>
+		<title>Twilight Imperium 3 : Race selector</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+
+
+		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!--[if lt IE 9]>
+		  <script src="../../assets/js/html5shiv.js"></script>
+		  <script src="../../assets/js/respond.min.js"></script>
+		<![endif]-->
+		
+		<style>
+			body {
+				background: url('background.jpg')
+			}
+			
+			.header {
+				color: rgb(245, 245, 245);
+				text-shadow: 0 0 1px rgba(255,255,255,0.5);
+			}
+			
+			#addPlayer span,
+			#removePlayer span {
+				font-size: 1.6em;
+				margin-left: 10px;
+			}
+			
+			#addPlayer:hover span {
+				color: green;
+				cursor: pointer;
+			}
+			
+			#removePlayer:hover span {
+				color: red;
+				cursor: pointer;
+			}
+			
+			.strategyBtn {
+				margin-bottom: -50px;
+				position: relative;
+				top: 5px;
+				right: 5px;
+			}
+		</style>
+	</head>
+  
+	<body>
+		
+		<div class="container">
+		<div class="col-md-10 col-md-offset-1">
+		
+			<div class="row header" style="padding: 20px">
+				<h1><strong>Twilight Imperium 3 Race Selector</strong></h1>
+				<p class="lead">
+					This small javascript application is a player helper for Twilight Imperium 3 which selects a random race for each player in your game.
+				</p>
+			</div>
+			
+			<div class="row">
+			<div class="col-md-12">
+			<div class="well">
+				<h2>Step 1 : Player names</h2>
+				<p>
+					Start by entering the names of all the players who will take on the roles of ancient galactic civilizations, each seeking to seize the imperial throne via warfare, diplomacy, and technological progression. 
+				</p>
+				<form id="players" class="form-horizontal">
+					<div class="form-group">
+						<label class="col-md-3 control-label">Player 1</label>
+						<div class="col-md-9">
+							<input type="text" class="playerName form-control">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">Player 2</label>
+						<div class="col-md-9">
+							<input type="text" class="playerName form-control">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">Player 3</label>
+						<div class="col-md-9">
+							<input type="text" class="playerName form-control">
+						</div>
+					</div>
+				</form>
+				
+				<div class="text-right">
+					<a id="addPlayer"><span class="glyphicon glyphicon-plus-sign"></span></a>
+					<a id="removePlayer"><span class="glyphicon glyphicon-minus-sign"></span></a>
+				</div>
+			</div>
+			</div>
+			</div>
+		
+			<div class="row">
+			<div class="col-md-6">
+			<div class="well">
+				<h2>Step 2 : Included expansions</h2>
+				<p>
+					Which expansions, if any, will you be playing with?
+				</p>
+				<form id="expansions" class="form-horizontal">
+					
+					<div class="form-group checkbox">
+							<label>
+								<div class="col-xs-2">
+									<input class="col-md-3 pull-right" type="checkbox" checked disabled>
+								</div>
+								<div class="col-xs-10">
+									Base game
+								</div>
+							</label>
+					</div>
+					
+					<div class="form-group checkbox">
+							<label>
+								<div class="col-xs-2">
+									<input id="SE" class="col-md-3 pull-right" type="checkbox">
+								</div>
+								<div class="col-xs-10">
+									Shattered Empire
+								</div>
+							</label>
+					</div>
+					
+					<div class="form-group checkbox">
+							<label>
+								<div class="col-xs-2">
+									<input id="SotT" class="col-md-3 pull-right" type="checkbox">
+								</div>
+								<div class="col-xs-10">
+									Shards of the Throne
+								</div>
+							</label>
+					</div>
+				</form>
+			</div>
+			</div>
+				
+				
+			<div class="col-md-6">
+			<div class="well">
+				<h2>Step 3 : Select races!</h2>
+				<button id="selectRaces" type="button" class="btn btn-primary btn-lg col-xs-12">Randomize!</button>
+			</div>
+			</div>
+			</div>
+			
+			<div id="results">
+			</div>
+			
+		</div>
+		</div>
+
+		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+		<script src="http://code.jquery.com/jquery.js"></script>
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+		
+		<script type="text/javascript">
+			function Player (name, race) {
+				this.name = name;
+				this.race = race;
+			}
+			
+			Player.prototype.getHtml = function() {
+				return "<div class='row'><div class='col-md-12'><div class='well'><h2>" + this.name + "</h2>" + this.race.getStrategyHtml() + this.race.getImageHtml() + "</div></div></div>";
+			}
+		
+			function Race(name, imageUrl, strategyUrl) {
+				this.name = name;
+				this.imageUrl = imageUrl;
+				this.strategyUrl = strategyUrl;
+			}
+			
+			Race.prototype.getImageHtml = function() {
+				return "<a href='img/" + this.imageUrl + "' target='_blank'><img class='img-responsive' src='img/" + this.imageUrl + "' title='" + this.name + "' /></a>";
+			}
+			Race.prototype.getStrategyHtml = function() {
+				return "<a class='btn btn-default btn-sm pull-right strategyBtn' href='" + this.strategyUrl + "' target='_blank'>Strategy guide</a>";
+			}
+			
+			
+			var baseRaceList = [
+				new Race("The Emirates of Hacan", "hacan.jpg", "http://gameknight.com/?page_id=538"),
+				new Race("The Universities of Jol-Nar", "jol-nar.jpg", "http://gameknight.com/?page_id=545"),
+				new Race("Barony of Letnev", "letnev.jpg", "http://gameknight.com/?page_id=554"),
+				new Race("The Sardakk N'orr", "sardakk.jpg", "http://gameknight.com/?page_id=588"),
+				new Race("The Federation of Sol", "sol.jpg", "http://gameknight.com/?page_id=590"),
+				new Race("The Xxcha Kingdom", "xxcha.jpg", "http://gameknight.com/?page_id=599"),
+				new Race("The L1Z1X Mindnet", "l1z1x.jpg", "http://gameknight.com/?page_id=556"),
+				new Race("The Mentak Coalition", "mentak.jpg", "http://gameknight.com/?page_id=558"),
+				new Race("The Naalu Collective", "naalu.jpg", "http://gameknight.com/?page_id=580"),
+				new Race("The Yssaril Tribes", "yssaril.jpg", "http://gameknight.com/?page_id=608")
+			];
+			
+			var SERaceList = [
+				new Race("The Embers of Muaat", "embers.jpg", "http://gameknight.com/?page_id=577"),
+				new Race("The Clan of Saar", "saar.jpg", "http://gameknight.com/?page_id=585"),
+				new Race("The Winnu", "winnu.jpg", "http://gameknight.com/?page_id=596"),
+				new Race("The Yin Brotherhood", "yin.jpg", "http://gameknight.com/?page_id=601")
+			]
+			
+			var SotTRaceList = [
+				new Race("The Arborec", "arborec.jpg", "http://gameknight.com/?page_id=479"),
+				new Race("The Ghosts of Creuss", "creuss.jpg", "http://gameknight.com/?page_id=514"),
+				new Race("The Nekro Virus", "nekro.jpg", "http://gameknight.com/?page_id=582")
+			]
+			
+			
+			$("#addPlayer").click( function () {
+				currentPlayerCount = $("form#players .form-group").size();
+				
+				if (currentPlayerCount >= 6) {
+					return false;
+				} else {
+					$("form#players").append(' \
+							<div class="form-group"> \
+								<label class="col-md-3 control-label">Player ' + (currentPlayerCount+1) + '</label> \
+								<div class="col-md-9"> \
+									<input type="text" class="playerName form-control"> \
+								</div> \
+							</div>'
+					)
+				}
+			});
+			
+			$("#removePlayer").click( function () {
+				currentPlayerCount = $("form#players .form-group").size();
+				
+				if (currentPlayerCount <= 3) {
+					return false;
+				} else {
+					$("form#players .form-group:last-child").remove();
+				}
+			});
+			
+			$("#selectRaces").click( function () {
+			
+				$("#results").html("");
+			
+				possibleRacesArray = baseRaceList.slice();
+				
+				if( $("#SE").is(':checked') ) {
+					possibleRacesArray = possibleRacesArray.concat(SERaceList);
+				}
+				if( $("#SotT").is(':checked') ) {
+					possibleRacesArray = possibleRacesArray.concat(SotTRaceList);
+				}
+				
+				playersArray = [];
+				$("input.playerName").each( function( index, input ) {
+					playerName = ((input.value == "") ? "Player " + (index+1) : input.value);
+					playerRaceIndex = Math.floor(Math.random()*possibleRacesArray.length);
+					playerRace = possibleRacesArray.splice(playerRaceIndex, 1)[0];
+					playersArray.push( new Player(playerName, playerRace) );
+				});
+				
+				for (var i = 0; i < playersArray.length; i++) {
+					player = playersArray[i];
+					$("#results").append( player.getHtml() );
+				}
+				
+				setTimeout(function() {
+					$('html, body').animate({
+						scrollTop: $("#results").offset().top - 20
+					}, 500);
+				}, 100);
+			});
+			
+			
+		</script>
+	</body>
+  
+</html>
