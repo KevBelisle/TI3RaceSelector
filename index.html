@@ -179,7 +179,7 @@
 			}
 			
 			Player.prototype.getHtml = function() {
-				return "<div class='row'><div class='col-md-12'><div class='well'><h2>" + this.name + "</h2>" + this.race.getStrategyHtml() + this.race.getImageHtml() + "</div></div></div>";
+				return "<div class='row'><div class='col-md-12'><div class='well'><h2>" + this.name + "</h2>" + this.race.getImageHtml() + "</div></div></div>";
 			}
 		
 			function Race(name, imageUrl, strategyUrl) {
@@ -190,9 +190,6 @@
 			
 			Race.prototype.getImageHtml = function() {
 				return "<a href='img/" + this.imageUrl + "' target='_blank'><img class='img-responsive' src='img/" + this.imageUrl + "' title='" + this.name + "' /></a>";
-			}
-			Race.prototype.getStrategyHtml = function() {
-				return "<a class='btn btn-default btn-sm pull-right strategyBtn' href='" + this.strategyUrl + "' target='_blank'>Strategy guide</a>";
 			}
 			
 			
